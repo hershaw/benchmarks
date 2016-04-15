@@ -20,7 +20,7 @@ There are two python implementations and one node.js implementation located in:
 
 - `python-benchmarks/sframe-benchmark.py`
 - `python-benchmarks/pandas-benchmark.py`
-- NUNO: FILL THIS OUT
+- `node-benchmarks/node-benchmark.js`
 
 ### Install
 
@@ -29,7 +29,7 @@ In `python-benchmarks/` there is a pip-requirements file. Create a virtual envir
 
 #### node
 
-NUNO, FILL ME IN!!!
+Having `node` (tested on v5.x) and `npm` installed run `npm install` inside `node-benchmarks/`.
 
 ### Run
 
@@ -39,4 +39,4 @@ A lot of stuff is printed, the important lines are the ones that display the tot
 
 - `pandas apply transforms`
 - `sframe apply transforms`
-- `NUNO FILL ME IN`
+- `node apply transforms`

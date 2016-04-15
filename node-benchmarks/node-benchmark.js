@@ -31,17 +31,15 @@ var combineCommand = transformCommands.find(t => t.type == 'combine')
 var rl = readline.createInterface({ input: file })
 var data = []
 rl.on('line', function(line) { data.push(line.split(',')) })
-console.time('parseCsv')
 file.on('end', function() {
-  console.timeEnd('parseCsv')
   var columns = data[0]
   data.splice(0, 1)
   transform(columns, data)
 })
 
 function transform(columns, data) {
-  console.time('transforms')
+  console.time('node apply transforms')
   data = t.map(data, combineFunc(columns, combineCommand))
   data = t.filter(data, dropFunc(columns, dropCommand))
-  console.timeEnd('transforms')
+  console.timeEnd('node apply transforms')
 }
