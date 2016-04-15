@@ -1,0 +1,15 @@
+{
+  "name": "node-benchmarks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "df-benchmark.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "transducers.js": "~0.3.2"
+  }
+}
