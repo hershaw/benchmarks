@@ -72,6 +72,8 @@ def create_drops_filter(drops):
 def apply_combines(sf, combines):
 
     def create_combine_func(vals, newval):
+        vals = set(vals)
+
         def real_combine(x):
             if x in vals:
                 return newval
@@ -80,7 +82,7 @@ def apply_combines(sf, combines):
 
     for c in combines:
         newval = '_'.join(map(str, c['payload']))
-        func = create_combine_func(set(c['payload']), newval)
+        func = create_combine_func(c['payload'], newval)
         sf[c['name']] = sf[c['name']].apply(func)
 
 
@@ -94,13 +96,21 @@ def apply_transforms(sf, transforms):
     return sf
 
 
+def check_output(sf):
+    for tform in transforms:
+        uniq = set([x for x in sf[tform['name']].unique()])
+        payload = set(tform['payload'])
+        assert not uniq & payload, payload
+
+
 def main():
     timer.start('sframe read csv')
-    sf = read_csv('./data/lc_big.csv')
+    sf = read_csv('./data/lc.csv')
     timer.end('sframe read csv')
     timer.start('sframe apply transforms')
-    apply_transforms(sf, transforms)
+    sf = apply_transforms(sf, transforms)
     timer.end('sframe apply transforms')
+    check_output(sf)
 
 
 if __name__ == '__main__':
