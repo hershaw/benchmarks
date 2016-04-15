@@ -96,7 +96,7 @@ def apply_transforms(sf, transforms):
 
 def main():
     timer.start('sframe read csv')
-    sf = read_csv('../data/lc_big.csv')
+    sf = read_csv('./data/lc_big.csv')
     timer.end('sframe read csv')
     timer.start('sframe apply transforms')
     apply_transforms(sf, transforms)
