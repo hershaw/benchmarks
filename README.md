@@ -14,6 +14,8 @@ They are one "drop" operation in which you must remove all rows that have a set 
 one "combine" command which just bins two values into a single value. Most of our UX bottle necks (because of execution time)
 reduce to these operations.
 
+The dataset is real consumer loan data from lending club.
+
 ### The competitors
 
 There are two python implementations and one node.js implementation located in:
