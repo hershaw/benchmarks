@@ -42,7 +42,7 @@ def check_output(df):
 def main():
     timer.start('pandas read csv')
     # df = pd.read_csv('./data/lc_big.csv')
-    df = pd.read_csv('./data/lc.csv')
+    df = pd.read_csv('./data/lc_big.csv')
     timer.end('pandas read csv')
     timer.start('pandas apply transforms')
     pandas_apply_transforms(df, transforms)
