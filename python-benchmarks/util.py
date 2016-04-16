@@ -1,4 +1,18 @@
 import time
+import re
+
+strip_non_number_regex = re.compile('[^0-9\.,]')
+
+
+def force_float(x):
+    try:
+        return float(x)
+    except:
+        try:
+            return float(
+                strip_non_number_regex.sub('', x).replace(',', '.'))
+        except:
+            return None
 
 
 class timer():
