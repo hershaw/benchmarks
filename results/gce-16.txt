@@ -1,0 +1,88 @@
+pandas-load_csv: 1.76035714149s
+pandas-apply_index: 3.40972709656s
+pandas-apply_transforms: 0.191529989243s
+pandas-calculate_stats: 0.430228948593s
+pandas-check_output: 0.0370740890503s
+pandas-total: 4.0687661171s
+==========================================
+2016-04-16 20:03:05,900 [INFO] sframe.cython.cy_server, 172: SFrame v1.8.5 started. Logging /tmp/sframe_server_1460836985.log
+------------------------------------------------------
+Inferred types from first line of file as
+column_type_hints=[int,float,float,float,float,str,str,float,str,str,str,str,str,float,str,str,str,str,str,str,str,str,str,str,float,float,str,float,float,float,float,float,float,str,float,str,float,float,float,float,float,float,float,float,float,str,float,str,str,float,str,float]
+If parsing fails due to incorrect types, you can correct
+the inferred type list above and pass it to read_csv in
+the column_type_hints argument
+------------------------------------------------------
+Read 92987 lines. Lines per second: 63161.5
+Finished parsing file /home/jj/benchmarks/data/lc.csv
+Parsing completed. Parsed 186777 lines in 2.27036 secs.
+sframe-load_csv: 4.47299909592s
+sframe-apply_index: 10.3613889217s
+sframe-apply_transforms: 3.07448005676s
+sframe-calculate_stats: 4.26694607735s
+sframe-check_output: 0.150008916855s
+sframe-total: 17.8530681133s
+(benchmarks)jj@sframe-16:~/benchmarks$ ./run-benchmarks.sh lc_big
+sys:1: DtypeWarning: Columns (0,19) have mixed types. Specify dtype option on import or set low_memory=False.
+pandas-load_csv: 6.18809008598s
+pandas-apply_index: 15.0458679199s
+pandas-apply_transforms: 0.679909944534s
+pandas-calculate_stats: 1.73777413368s
+pandas-check_output: 0.145020961761s
+pandas-total: 17.6087870598s
+==========================================
+2016-04-16 20:04:35,770 [INFO] sframe.cython.cy_server, 172: SFrame v1.8.5 started. Logging /tmp/sframe_server_1460837075.log
+------------------------------------------------------
+Inferred types from first line of file as
+column_type_hints=[int,float,float,float,float,str,str,float,str,str,str,str,str,float,str,str,str,str,str,str,str,str,str,str,float,float,str,float,float,float,float,float,float,str,float,str,float,float,float,float,float,float,float,float,float,str,float,str,str,float,str,float,str]
+If parsing fails due to incorrect types, you can correct
+the inferred type list above and pass it to read_csv in
+the column_type_hints argument
+------------------------------------------------------
+Unable to parse line "Loans that do not meet the credit policy,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
+Read 89872 lines. Lines per second: 76218.6
+Read 543663 lines. Lines per second: 85221.5
+1 lines failed to parse correctly
+Finished parsing file /home/jj/benchmarks/data/lc_big.csv
+Parsing completed. Parsed 756878 lines in 9.05472 secs.
+sframe-load_csv: 12.4704990387s
+sframe-apply_index: 7.52581191063s
+sframe-apply_transforms: 9.78955507278s
+sframe-calculate_stats: 13.5767900944s
+sframe-check_output: 0.433606147766s
+sframe-total: 31.3259391785s
+(benchmarks)jj@sframe-16:~/benchmarks$ ./run-benchmarks.sh lc_huge
+pandas-load_csv: 53.5118360519s
+pandas-apply_index: 85.5364470482s
+pandas-apply_transforms: 4.08263683319s
+pandas-calculate_stats: 9.99826908112s
+pandas-check_output: 0.967988967896s
+pandas-total: 100.585586071s
+==========================================
+2016-04-16 20:08:36,149 [INFO] sframe.cython.cy_server, 172: SFrame v1.8.5 started. Logging /tmp/sframe_server_1460837315.log
+------------------------------------------------------
+Inferred types from first line of file as
+column_type_hints=[int,float,float,float,float,str,str,float,str,str,str,str,str,float,str,str,str,str,str,str,str,str,str,str,float,float,str,float,float,float,float,float,float,str,float,str,float,float,float,float,float,float,float,float,float,str,float,str,str,float,str,float]
+If parsing fails due to incorrect types, you can correct
+the inferred type list above and pass it to read_csv in
+the column_type_hints argument
+------------------------------------------------------
+Read 92987 lines. Lines per second: 80929.7
+Read 591222 lines. Lines per second: 84041
+Read 990461 lines. Lines per second: 78819.4
+Read 1393257 lines. Lines per second: 77210.2
+Read 1792552 lines. Lines per second: 75612.1
+Read 2191512 lines. Lines per second: 74678.4
+Read 2598078 lines. Lines per second: 73718.3
+Read 2999021 lines. Lines per second: 72880.4
+Read 3392201 lines. Lines per second: 72402.3
+Read 3790955 lines. Lines per second: 71666.7
+Read 4193857 lines. Lines per second: 71241.7
+Finished parsing file /home/jj/benchmarks/data/lc_huge.csv
+Parsing completed. Parsed 4482648 lines in 62.9606 secs.
+sframe-load_csv: 67.9021921158s
+sframe-apply_index: 7.87478208542s
+sframe-apply_transforms: 56.133261919s
+sframe-calculate_stats: 52.3159000874s
+sframe-check_output: 2.48191094398s
+sframe-total: 118.806081772s

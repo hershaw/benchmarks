@@ -1,0 +1,116 @@
+(benchmarks)jj@sframe-8:~/benchmarks$ ./run-benchmarks.sh lc
+pandas-load_csv: 1.68771219254s
+pandas-apply_index: 3.47766304016s
+pandas-apply_transforms: 0.193743944168s
+pandas-calculate_stats: 0.447462081909s
+pandas-check_output: 0.037740945816s
+pandas-total: 4.1568210125s
+==========================================
+2016-04-16 19:57:35,719 [INFO] sframe.cython.cy_server, 172: SFrame v1.8.5 started. Logging /tmp/sframe_server_1460836655.log
+------------------------------------------------------
+Inferred types from first line of file as
+column_type_hints=[int,float,float,float,float,str,str,float,str,str,str,str,str,float,str,str,str,str,str,str,str,str,str,str,float,float,str,float,float,float,float,float,float,str,float,str,float,float,float,float,float,float,float,float,float,str,float,str,str,float,str,float]
+If parsing fails due to incorrect types, you can correct
+the inferred type list above and pass it to read_csv in
+the column_type_hints argument
+------------------------------------------------------
+Read 92987 lines. Lines per second: 79334.7
+Finished parsing file /home/jj/benchmarks/data/lc.csv
+Parsing completed. Parsed 186777 lines in 2.02752 secs.
+sframe-load_csv: 4.18148612976s
+sframe-apply_index: 5.06446003914s
+sframe-apply_transforms: 5.01679301262s
+sframe-calculate_stats: 3.86991810799s
+sframe-check_output: 0.203042030334s
+sframe-total: 14.1544129848s
+(benchmarks)jj@sframe-8:~/benchmarks$ ./run-benchmarks.sh lc_big
+sys:1: DtypeWarning: Columns (0,19) have mixed types. Specify dtype option on import or set low_memory=False.
+pandas-load_csv: 6.53142118454s
+pandas-apply_index: 15.1453669071s
+pandas-apply_transforms: 0.712713003159s
+pandas-calculate_stats: 1.75764417648s
+pandas-check_output: 0.147580862045s
+pandas-total: 17.7635440826s
+==========================================
+2016-04-16 19:58:59,928 [INFO] sframe.cython.cy_server, 172: SFrame v1.8.5 started. Logging /tmp/sframe_server_1460836739.log
+------------------------------------------------------
+Inferred types from first line of file as
+column_type_hints=[int,float,float,float,float,str,str,float,str,str,str,str,str,float,str,str,str,str,str,str,str,str,str,str,float,float,str,float,float,float,float,float,float,str,float,str,float,float,float,float,float,float,float,float,float,str,float,str,str,float,str,float,str]
+If parsing fails due to incorrect types, you can correct
+the inferred type list above and pass it to read_csv in
+the column_type_hints argument
+------------------------------------------------------
+Unable to parse line "Loans that do not meet the credit policy,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
+Read 89872 lines. Lines per second: 79934
+Read 543663 lines. Lines per second: 76601.5
+1 lines failed to parse correctly
+Finished parsing file /home/jj/benchmarks/data/lc_big.csv
+Parsing completed. Parsed 756878 lines in 10.1522 secs.
+sframe-load_csv: 13.9850580692s
+sframe-apply_index: 4.1511797905s
+sframe-apply_transforms: 18.3340659142s
+sframe-calculate_stats: 13.004527092s
+sframe-check_output: 0.782033205032s
+sframe-total: 36.2724890709s
+(benchmarks)jj@sframe-8:~/benchmarks$ ./run-benchmarks.sh lc_huge
+pandas-load_csv: 41.4162700176s
+pandas-apply_index: 83.7987909317s
+Traceback (most recent call last):
+  File "benchmark.py", line 30, in <module>
+    ('check_output', [transforms]),
+  File "benchmark.py", line 20, in run_benchmark
+    frame = getattr(module, funcname)(frame, *args)
+  File "/home/jj/benchmarks/python-benchmarks/pandas_benchmark.py", line 43, in apply_transforms
+    drop_rows_with_vals(df, drops)
+  File "/home/jj/benchmarks/python-benchmarks/pandas_benchmark.py", line 27, in drop_rows_with_vals
+    df.drop(df[colname].isin(drop['payload']), inplace=True)
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/generic.py", line 1874, in drop
+    dropped = self.reindex(**{axis_name: new_axis})
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/frame.py", line 2735, in reindex
+    **kwargs)
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/generic.py", line 2207, in reindex
+    self._consolidate_inplace()
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/generic.py", line 2726, in _consolidate_inplace
+    self._protect_consolidate(f)
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/generic.py", line 2715, in _protect_consolidate
+    result = f()
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/generic.py", line 2724, in f
+    self._data = self._data.consolidate()
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/internals.py", line 3208, in consolidate
+    bm._consolidate_inplace()
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/internals.py", line 3213, in _consolidate_inplace
+    self.blocks = tuple(_consolidate(self.blocks))
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/internals.py", line 4198, in _consolidate
+    _can_consolidate=_can_consolidate)
+  File "/home/jj/.virtualenvs/benchmarks/local/lib/python2.7/site-packages/pandas/core/internals.py", line 4221, in _merge_blocks
+    new_values = new_values[argsort]
+MemoryError
+==========================================
+2016-04-16 20:02:19,180 [INFO] sframe.cython.cy_server, 172: SFrame v1.8.5 started. Logging /tmp/sframe_server_1460836938.log
+------------------------------------------------------
+Inferred types from first line of file as
+column_type_hints=[int,float,float,float,float,str,str,float,str,str,str,str,str,float,str,str,str,str,str,str,str,str,str,str,float,float,str,float,float,float,float,float,float,str,float,str,float,float,float,float,float,float,float,float,float,str,float,str,str,float,str,float]
+If parsing fails due to incorrect types, you can correct
+the inferred type list above and pass it to read_csv in
+the column_type_hints argument
+------------------------------------------------------
+Read 92987 lines. Lines per second: 90320.4
+Read 591222 lines. Lines per second: 80642.4
+Read 990461 lines. Lines per second: 73601.5
+Read 1393257 lines. Lines per second: 70274.5
+Read 1697500 lines. Lines per second: 66703.3
+Read 2089240 lines. Lines per second: 66459.7
+Read 2491484 lines. Lines per second: 65401.4
+Read 2893602 lines. Lines per second: 65565.2
+Read 3292198 lines. Lines per second: 64992.4
+Read 3693465 lines. Lines per second: 65174.3
+Read 3992507 lines. Lines per second: 64320.6
+Read 4393889 lines. Lines per second: 64247.1
+Finished parsing file /home/jj/benchmarks/data/lc_huge.csv
+Parsing completed. Parsed 4482648 lines in 69.3529 secs.
+sframe-load_csv: 74.6198601723s
+sframe-apply_index: 4.39627695084s
+sframe-apply_transforms: 107.195441961s
+sframe-calculate_stats: 39.6235218048s
+sframe-check_output: 4.70902681351s
+sframe-total: 155.924450874s
