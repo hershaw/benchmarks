@@ -57,42 +57,26 @@ def read_csv(pathname):
     return sframe.SFrame.read_csv(pathname)
 
 
-def create_drops_filter(drops):
+def do_drops(sf, drops):
     for drop in drops:
         drop['payload'] = set(drop['payload'])
-
-    def real_drop(x):
-        for drop in drops:
-            if x[drop['name']] in drop['payload']:
-                return False
-        return True
-    return real_drop
+        sf = sf[sf[drop['name']].apply(lambda x: x not in drop['payload'])]
+    return sf
 
 
-def apply_combines(sf, combines):
-
-    def create_combine_func(vals, newval):
-        vals = set(vals)
-
-        def real_combine(x):
-            if x in vals:
-                return newval
-            return x
-        return real_combine
-
+def do_combines(sf, combines):
     for c in combines:
         newval = '_'.join(map(str, c['payload']))
-        func = create_combine_func(c['payload'], newval)
-        sf[c['name']] = sf[c['name']].apply(func)
+        c['payload'] = set(c['payload'])
+        sf[c['name']] = sf[c['name']].apply(
+            lambda x: newval if x in c['payload'] else x)
 
 
 def apply_transforms(sf, transforms):
-    # first do all drops
     drops, combines = split_drops_combines(transforms)
-    # this will create a copy
-    sf = sf[sf.apply(create_drops_filter(drops))]
-    # this will make the changes in place
-    apply_combines(sf, combines)
+    sf = do_drops(sf, drops)
+    do_combines(sf, combines)
+    len(sf)
     return sf
 
 
@@ -104,6 +88,8 @@ def check_output(sf):
 
 
 def main():
+
+    sframe.SArray([1, 2, 3]).apply(lambda x: x+1)
     timer.start('sframe read csv')
     sf = read_csv('./data/lc_big.csv')
     timer.end('sframe read csv')
