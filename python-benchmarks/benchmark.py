@@ -1,3 +1,4 @@
+import os
 from util import timer
 from index import index
 from transforms import transforms
@@ -23,9 +24,15 @@ def run_benchmark(libname, filename, benchmarks):
 
 
 if __name__ == '__main__':
-    run_benchmark(sys.argv[1], sys.argv[2], [
+    lib = sys.argv[1]
+    tmp_filename = '../data/tmp_{}.csv'.format(lib)
+    run_benchmark(lib, sys.argv[2], [
         ('apply_index', [index]),
-        ('apply_transforms', [transforms]),
         ('calculate_stats', [index]),
+        ('apply_transforms', [transforms]),
         ('check_output', [transforms]),
+        # ('to_csv', [tmp_filename]),
+        # ('set_dtypes', [index]),
+        ('calculate_stats', [index]),
     ])
+    # os.remove(tmp_filename)

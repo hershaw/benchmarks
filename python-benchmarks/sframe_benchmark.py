@@ -5,22 +5,31 @@ import datetime as dt
 
 def to_datetime(val):
     try:
-        return dt.datetime.strptime(val, '%b-%Y')
+        return (
+            dt.datetime.strptime(val, '%b-%Y') - dt.datetime(1970, 1, 1)).total_seconds() * 1000
     except:
         return None
 
 
 def apply_index(sf, index):
     for col in index:
-        sarr = sf[col['name']]
-        if col['type'] == 'date':
-            sf[col['name']] = sarr.apply(to_datetime)
-        elif col['type'] == 'number':
-            sf[col['name']] = sarr.apply(force_float)
-        # elif col['type'] == 'category':
-            # sf[col['name']] = sarr.apply(empty_str_to_null)
-    # make sure all transforms are applied
-    len(sf)
+        name, _type = col['name'], col['type']
+        if _type == 'date':
+            sf[name] = sf[name].apply(to_datetime).astype(int)
+        elif _type == 'number':
+            sf[name] = sf[name].apply(force_float).astype(float)
+        # I don't think you need to set category as a type. all the stats
+        # we care about should continue to work.
+    return sf
+
+
+def set_dtypes(sf, index):
+    for col in index:
+        name, _type = col['name'], col['type']
+        if _type == 'date':
+            sf[name] = sf[name].astype(int)
+        elif _type == 'number':
+            sf[name] = sf[name].astype(float)
     return sf
 
 
@@ -33,16 +42,19 @@ def num_uniques(sf, col):
     return uniques
 
 
-def load_csv(pathname):
-    return sframe.SFrame.read_csv(pathname)
+def load_csv(filename):
+    return sframe.SFrame.read_csv(filename)
+
+
+def to_csv(sf, filename):
+    sf.save(filename, 'csv')
+    return load_csv(filename)
 
 
 def do_drops(sf, drops):
     for drop in drops:
         payload = set(drop['payload'])
         sf = sf[sf[drop['name']].apply(lambda x: x not in payload)]
-    # make sure all transforms are applied
-    len(sf)
     return sf
 
 
@@ -52,8 +64,6 @@ def do_combines(sf, combines):
         c['payload'] = set(c['payload'])
         sf[c['name']] = sf[c['name']].apply(
             lambda x: newval if x in c['payload'] else x)
-    # make sure all transforms are applied
-    len(sf)
     return sf
 
 
@@ -61,7 +71,6 @@ def apply_transforms(sf, transforms):
     drops, combines = split_drops_combines(transforms)
     sf = do_drops(sf, drops)
     do_combines(sf, combines)
-    len(sf)
     return sf
 
 
@@ -69,7 +78,7 @@ def calculate_stats(sf, index):
     info = []
     for col in index:
         name, _type = col['name'], col['type']
-        if _type == 'number':
+        if _type in ('number', 'date'):
             info.append(sf.groupby(name, {
                 'min': sframe.aggregate.MIN(name),
                 'max': sframe.aggregate.MAX(name),
@@ -90,6 +99,7 @@ def check_output(sf, transforms):
         uniq = set([x for x in sf[tform['name']].unique()])
         payload = set(tform['payload'])
         assert not uniq & payload, payload
+    return sf
 
 
 # little optimization yucheng told me to do

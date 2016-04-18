@@ -6,6 +6,11 @@ def load_csv(filename):
     return pd.read_csv(filename)
 
 
+def to_csv(df, filename):
+    df.to_csv(filename, index=False, encoding='utf-8')
+    return load_csv(filename)
+
+
 def apply_index(df, index):
     for col in index:
         series = df[col['name']]
@@ -16,6 +21,11 @@ def apply_index(df, index):
             df[col['name']] = series.map(force_float)
         # elif col['type'] == 'category':
             # sf[col['name']] = sarr.apply(empty_str_to_null)
+    return df
+
+
+def set_dtypes(df, index):
+    # I don't think anything needs to be done here...
     return df
 
 
@@ -67,3 +77,4 @@ def calculate_stats(df, index):
 def check_output(df, transforms):
     for tform in transforms:
         assert not df[tform['name']].isin(tform['payload']).sum()
+    return df
