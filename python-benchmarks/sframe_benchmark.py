@@ -2,6 +2,7 @@ from collections import Counter
 import sframe
 from util import force_float, split_drops_combines
 import datetime as dt
+import math
 
 
 def to_datetime(val):
@@ -75,26 +76,61 @@ def apply_transforms(sf, transforms):
     return sf
 
 
+def get_hist(sarr, nbins, _min, _max):
+    if _min == _max:
+        return [{'start': _min, 'end': _max, 'count': len(sarr)}]
+
+    bins = []
+    step_size = (_max - _min) / nbins
+    i = _min
+    while i < _max:
+        bins.append({'start': i, 'end': min(i + step_size, _max), 'count': 0})
+        i += step_size
+
+    bin_enumerator = list(enumerate(bins))
+
+    def assign_bin(x):
+        for i, b in bin_enumerator:
+            if x >= b['start'] and x <= b['end']:
+                return int(i)
+        print('could not bin {}, {}, {}'.format(x, _min, _max))
+
+    bin_assignments = sarr.apply(assign_bin).astype(int)
+
+    def do_bin_count(_bins, i):
+        _bins[i]['count'] += 1
+        return _bins
+
+    bins = reduce(do_bin_count, bin_assignments, bins)
+
+    return bins
+
+
 def calculate_stats(sf, index):
     info = []
     for col in index:
         name, _type = col['name'], col['type']
         sarr = sf[name]
         if _type in ('number', 'date'):
+            sarr = sarr.dropna()
+            _min, _max = sarr.min(), sarr.max()
             info.append({
-                'min': sarr.min(),
-                'max': sarr.max(),
+                'min': _min,
+                'max': _max,
                 'mean': sarr.mean(),
+                'hist': get_hist(sarr, 30, _min, _max)
             })
         elif _type == 'category':
-            uniqCounts = Counter()
 
-            def inc(x): uniqCounts[x] += 1
-            sarr.apply(inc)
+            # do a reduce in order to avoid building a new data structure
+            def inc(acc, x):
+                acc[x] += 1
+                return acc
 
+            counts = reduce(inc, sarr, Counter())
             info.append({
-                'uniques': len(uniqCounts),
-                'counts': uniqCounts.most_common(10),
+                'uniques': len(counts),
+                'counts': counts.most_common(10),
             })
     return sf
 

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from util import split_drops_combines, force_float
 
 
@@ -55,16 +56,26 @@ def apply_transforms(df, transforms):
     return df
 
 
+def get_hist(series, nbins, _min, _max):
+    if _min == _max or not len(series):
+        return [len(series)]
+    # not the same format as the sframe one, but this should be okay
+    return pd.cut(series, nbins)
+
+
 def calculate_stats(df, index):
     info = []
     for col in index:
         name, _type = col['name'], col['type']
         series = df[name]
         if _type == 'number':
+            series = series.dropna()
+            _min, _max = series.min(), series.max()
             info.append({
-                'min': series.min(),
-                'max': series.max(),
+                'min': _min,
+                'max': _max,
                 'mean': series.mean(),
+                'hist': get_hist(series, 30, _min, _max)
             })
         elif _type == 'category':
             info.append({
