@@ -77,6 +77,29 @@ def apply_transforms(sf, transforms):
 
 
 def get_hist(sarr, nbins, _min, _max):
+    # assuming the sarr is already sorted
+
+    if _min == _max:
+        return [{'start': _min, 'end': _max, 'count': len(sarr)}]
+
+    bins = []
+    step_size = (_max - _min) / nbins
+    i = _min
+    while i < _max:
+        bins.append({'start': i, 'end': min(i + step_size, _max), 'count': 0})
+        i += step_size
+
+    def incbin(index_and_bins, x):
+        i, _bins = index_and_bins
+        if x > _bins[i]['end']:
+            i += 1
+        _bins[i]['count'] += 1
+        return i, _bins
+
+    reduce(incbin, sarr, (0, bins))
+
+"""
+def get_hist(sarr, nbins, _min, _max):
     if _min == _max:
         return [{'start': _min, 'end': _max, 'count': len(sarr)}]
 
@@ -104,6 +127,7 @@ def get_hist(sarr, nbins, _min, _max):
     bins = reduce(do_bin_count, bin_assignments, bins)
 
     return bins
+"""
 
 
 def calculate_stats(sf, index):
@@ -112,7 +136,7 @@ def calculate_stats(sf, index):
         name, _type = col['name'], col['type']
         sarr = sf[name]
         if _type in ('number', 'date'):
-            sarr = sarr.dropna()
+            sarr = sarr.dropna().sort()
             _min, _max = sarr.min(), sarr.max()
             info.append({
                 'min': _min,
