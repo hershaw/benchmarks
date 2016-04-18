@@ -1,5 +1,7 @@
 #!/bin/bash
 
+git pull origin master
+
 cd python-benchmarks
 
 python benchmark.py pandas $1
