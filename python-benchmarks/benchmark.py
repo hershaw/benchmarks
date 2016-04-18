@@ -28,7 +28,7 @@ if __name__ == '__main__':
     tmp_filename = '../data/tmp_{}.csv'.format(lib)
     run_benchmark(lib, sys.argv[2], [
         ('apply_index', [index]),
-        ('calculate_stats', [index]),
+        # ('calculate_stats', [index]),
         ('apply_transforms', [transforms]),
         ('check_output', [transforms]),
         # ('to_csv', [tmp_filename]),

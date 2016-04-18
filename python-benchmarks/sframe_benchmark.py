@@ -1,3 +1,4 @@
+from collections import Counter
 import sframe
 from util import force_float, split_drops_combines
 import datetime as dt
@@ -61,9 +62,9 @@ def do_drops(sf, drops):
 def do_combines(sf, combines):
     for c in combines:
         newval = '_'.join(map(str, c['payload']))
-        c['payload'] = set(c['payload'])
+        payload = set(c['payload'])
         sf[c['name']] = sf[c['name']].apply(
-            lambda x: newval if x in c['payload'] else x)
+            lambda x: newval if x in payload else x)
     return sf
 
 
@@ -78,19 +79,23 @@ def calculate_stats(sf, index):
     info = []
     for col in index:
         name, _type = col['name'], col['type']
+        sarr = sf[name]
         if _type in ('number', 'date'):
-            info.append(sf.groupby(name, {
-                'min': sframe.aggregate.MIN(name),
-                'max': sframe.aggregate.MAX(name),
-                'mean': sframe.aggregate.MEAN(name),
-            }))
+            info.append({
+                'min': sarr.min(),
+                'max': sarr.max(),
+                'mean': sarr.mean(),
+            })
         elif _type == 'category':
-            info.append(sf.groupby(name, {
-                'uniques': sframe.aggregate.COUNT_DISTINCT(name),
-                'counts': sframe.aggregate.FREQ_COUNT(name),
-            }))
-        # make sure it's actually applied
-        len(info[-1])
+            uniqCounts = Counter()
+
+            def inc(x): uniqCounts[x] += 1
+            sarr.apply(inc)
+
+            info.append({
+                'uniques': len(uniqCounts),
+                'counts': uniqCounts.most_common(10),
+            })
     return sf
 
 
