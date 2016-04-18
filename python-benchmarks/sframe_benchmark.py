@@ -89,14 +89,19 @@ def get_hist(sarr, nbins, _min, _max):
         bins.append({'start': i, 'end': min(i + step_size, _max), 'count': 0})
         i += step_size
 
-    def incbin(index_and_bins, x):
-        i, _bins = index_and_bins
-        if x > _bins[i]['end']:
-            i += 1
-        _bins[i]['count'] += 1
-        return i, _bins
+    def incbin(_bins, x):
+        if x is None:
+            return _bins
 
-    reduce(incbin, sarr, (0, bins))
+        for b in _bins:
+            if x >= b['start'] and x <= b['end']:
+                b['count'] += 1
+                break
+        return _bins
+
+    reduce(incbin, sarr, bins)
+
+    return bins
 
 """
 def get_hist(sarr, nbins, _min, _max):
@@ -136,7 +141,6 @@ def calculate_stats(sf, index):
         name, _type = col['name'], col['type']
         sarr = sf[name]
         if _type in ('number', 'date'):
-            sarr = sarr.dropna().sort()
             _min, _max = sarr.min(), sarr.max()
             info.append({
                 'min': _min,
