@@ -34,8 +34,11 @@ def drop_rows_with_vals(df, drops):
     for drop in drops:
         if len(drop['payload']) == 0:
             return
+        payload = set(drop['payload'])
         colname = drop['name']
-        df.drop(df[colname].isin(drop['payload']), inplace=True)
+        # need to check if the payload exists or pandas will throw an exception
+        mask = df[colname].isin(payload)
+        df.drop(df.loc[mask].index, inplace=True)
 
 
 def combine(df, combines):

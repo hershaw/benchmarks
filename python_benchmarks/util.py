@@ -33,3 +33,19 @@ def split_drops_combines(transforms):
         filter(lambda x: x['type'] == 'drop', transforms),
         filter(lambda x: x['type'] == 'combine', transforms),
     ]
+
+
+"""
+This was here because of sframe barfing in python 2.7 when trying to access
+sframe columns.
+
+def unicode_2str(obj):
+    if type(obj) is dict:
+        for key in obj:
+            obj[key] = unicode_2str(obj[key])
+    elif type(obj) is list:
+        map(unicode_2str, obj)
+    elif type(obj) is unicode:
+        obj = str(obj)
+    return obj
+"""

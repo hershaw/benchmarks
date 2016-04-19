@@ -1,0 +1,213 @@
+[
+    {
+        "name": "loan_amnt",
+        "type": "number"
+    },
+    {
+        "name": "funded_amnt",
+        "type": "number"
+    },
+    {
+        "name": "funded_amnt_inv",
+        "type": "number"
+    },
+    {
+        "name": "term",
+        "type": "number"
+    },
+    {
+        "name": "int_rate",
+        "type": "number"
+    },
+    {
+        "name": "installment",
+        "type": "number"
+    },
+    {
+        "name": "grade",
+        "type": "category"
+    },
+    {
+        "name": "sub_grade",
+        "type": "category"
+    },
+    {
+        "name": "emp_title",
+        "type": "category"
+    },
+    {
+        "name": "emp_length",
+        "type": "category"
+    },
+    {
+        "name": "home_ownership",
+        "type": "category"
+    },
+    {
+        "name": "annual_inc",
+        "type": "number"
+    },
+    {
+        "name": "verification_status",
+        "type": "category"
+    },
+    {
+        "name": "issue_d",
+        "payload": {
+            "format": "MMM YYYY"
+        },
+        "role": "date",
+        "type": "date"
+    },
+    {
+        "name": "loan_status",
+        "payload": {
+            "negative": [
+                "Fully Paid"
+            ],
+            "positive": [
+                "Charged Off"
+            ]
+        },
+        "role": "target",
+        "type": "category"
+    },
+    {
+        "name": "pymnt_plan",
+        "type": "category"
+    },
+    {
+        "name": "purpose",
+        "type": "category"
+    },
+    {
+        "name": "title",
+        "type": "category"
+    },
+    {
+        "name": "zip_code",
+        "type": "category"
+    },
+    {
+        "name": "addr_state",
+        "type": "category"
+    },
+    {
+        "name": "dti",
+        "type": "number"
+    },
+    {
+        "name": "delinq_2yrs",
+        "type": "number"
+    },
+    {
+        "name": "earliest_cr_line",
+        "payload": {
+            "format": "MMM YYYY"
+        },
+        "type": "date"
+    },
+    {
+        "name": "inq_last_6mths",
+        "type": "number"
+    },
+    {
+        "name": "mths_since_last_delinq",
+        "type": "number"
+    },
+    {
+        "name": "mths_since_last_record",
+        "type": "number"
+    },
+    {
+        "name": "open_acc",
+        "type": "number"
+    },
+    {
+        "name": "pub_rec",
+        "type": "number"
+    },
+    {
+        "name": "revol_bal",
+        "type": "number"
+    },
+    {
+        "name": "revol_util",
+        "type": "number"
+    },
+    {
+        "name": "total_acc",
+        "type": "number"
+    },
+    {
+        "name": "initial_list_status",
+        "type": "category"
+    },
+    {
+        "name": "out_prncp",
+        "type": "number"
+    },
+    {
+        "name": "out_prncp_inv",
+        "type": "number"
+    },
+    {
+        "name": "total_pymnt",
+        "type": "number"
+    },
+    {
+        "name": "total_pymnt_inv",
+        "type": "number"
+    },
+    {
+        "name": "total_rec_prncp",
+        "type": "number"
+    },
+    {
+        "name": "total_rec_int",
+        "type": "number"
+    },
+    {
+        "name": "total_rec_late_fee",
+        "type": "number"
+    },
+    {
+        "name": "recoveries",
+        "type": "number"
+    },
+    {
+        "name": "collection_recovery_fee",
+        "type": "number"
+    },
+    {
+        "name": "last_pymnt_d",
+        "type": "category"
+    },
+    {
+        "name": "last_pymnt_amnt",
+        "type": "number"
+    },
+    {
+        "name": "next_pymnt_d",
+        "type": "number"
+    },
+    {
+        "name": "last_credit_pull_d",
+        "payload": {
+            "format": "MMM YYYY"
+        },
+        "type": "date"
+    },
+    {
+        "name": "collections_12_mths_ex_med",
+        "type": "number"
+    },
+    {
+        "name": "mths_since_last_major_derog",
+        "type": "number"
+    },
+    {
+        "name": "policy_code",
+        "type": "number"
+    }
+]

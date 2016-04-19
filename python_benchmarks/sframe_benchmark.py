@@ -2,13 +2,15 @@ from collections import Counter
 import sframe
 from util import force_float, split_drops_combines
 import datetime as dt
-import math
+from functools import reduce
+# import math
 
 
 def to_datetime(val):
     try:
         return (
-            dt.datetime.strptime(val, '%b-%Y') - dt.datetime(1970, 1, 1)).total_seconds() * 1000
+            dt.datetime.strptime(
+                val, '%b-%Y') - dt.datetime(1970, 1, 1)).total_seconds() * 1000
     except:
         return None
 
@@ -18,6 +20,7 @@ def apply_index(sf, index):
         name, _type = col['name'], col['type']
         if _type == 'date':
             sf[name] = sf[name].apply(to_datetime).astype(int)
+            # sf[name] = sf[name].str_to_datetime('%b-%Y')
         elif _type == 'number':
             sf[name] = sf[name].apply(force_float).astype(float)
         # I don't think you need to set category as a type. all the stats

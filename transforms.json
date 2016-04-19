@@ -1,0 +1,42 @@
+{
+    "small": [
+        {"type": "combine", "name": "addr_state", "payload": ["CA", "TX"]},
+        {"type": "drop", "name": "addr_state", "payload": ["IA", "ME"]}
+    ],
+    "medium": [
+        {"type": "combine", "name": "addr_state", "payload": ["CA", "TX"]},
+        {"type": "drop", "name": "addr_state", "payload": ["IA", "ME"]},
+        {"type": "combine", "name": "grade", "payload": ["E", "F"]},
+        {"type": "combine", "name": "grade", "payload": ["A", "B", "C"]},
+        {"type": "drop", "name": "grade", "payload": ["G"]},
+        {"type": "drop", "name": "emp_title", "payload": ["Sales"]}
+    ],
+    "large": [
+        {"type": "combine", "name": "addr_state", "payload": ["CA", "TX"]},
+        {"type": "drop", "name": "addr_state", "payload": ["IA", "ME"]},
+        {"type": "combine", "name": "grade", "payload": ["E", "F"]},
+        {"type": "combine", "name": "grade", "payload": ["A", "B", "C"]},
+        {"type": "drop", "name": "grade", "payload": ["G"]},
+        {"type": "drop", "name": "emp_title", "payload": ["Sales"]},
+        {"type": "combine", "name": "purpose", "payload": [
+            "renewable_energy", "educational", "vacation", "house", "moving",
+            "wedding", "medical", "car", "small_business"
+        ]},
+        {"type": "combine", "name": "zip_code", "payload": [
+            "663xx", "203xx", "375xx", "965xx", "834xx", "833xx", "522xx",
+            "523xx", "689xx", "680xx", "049xx", "942xx", "643xx", "821xx",
+            "340xx", "929xx", "524xx", "510xx", "909xx", "516xx", "832xx",
+            "908xx", "516xx", "832xx", "098xx", "580xx", "528xx", "838xx",
+            "353xx", "007xx", "093xx", "414xx", "836xx", "004xx", "040xx",
+            "681xx", "041xx", "091xx", "962xx", "311xx", "587xx", "969xx",
+            "837xx", "685xx", "878xx", "389xx", "963xx", "527xx"
+        ]},
+        {"type": "combine", "name": "zip_code", "payload": [
+            "VERIFIED - income", "VERIFIED - income source"
+        ]},
+        {"type": "drop", "name": "home_ownership", "payload": ["ANY"]},
+        {"type": "combine", "name": "home_ownership", "payload": [
+            "NONE", "OTHER", "OWN"
+        ]}
+    ]
+}

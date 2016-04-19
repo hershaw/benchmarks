@@ -1,4 +1,4 @@
-import os
+# import os
 from util import timer
 from index import index
 from transforms import transforms
@@ -12,7 +12,7 @@ def run_benchmark(libname, filename, benchmarks):
         import sframe_benchmark as module
 
     timer.start('{}-load_csv'.format(libname))
-    frame = module.load_csv('../data/{}.csv'.format(filename))
+    frame = module.load_csv('./data/{}.csv'.format(filename))
     timer.end('{}-load_csv'.format(libname))
 
     timer.start('{}-total'.format(libname))
@@ -24,9 +24,11 @@ def run_benchmark(libname, filename, benchmarks):
 
 
 if __name__ == '__main__':
-    lib = sys.argv[1]
-    tmp_filename = '../data/tmp_{}.csv'.format(lib)
-    run_benchmark(lib, sys.argv[2], [
+    lib, dataset, transform_set = sys.argv[1:]
+    assert transform_set in transforms, 'Select transform from {}'.format(
+        transforms.keys())
+    transforms = transforms[transform_set]
+    run_benchmark(lib, dataset, [
         ('apply_index', [index]),
         # ('calculate_stats', [index]),
         ('apply_transforms', [transforms]),
