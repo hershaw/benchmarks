@@ -1,16 +1,66 @@
 'use strict';
 
+var fs = require('fs')
 var moment = require('moment')
-var t = require('transducers.js')
-var range = require('lodash/fp/range')
+var sampleSize = require('lodash/fp/sampleSize')
 var Dodo = require('dodos').default
+
 var parse = require('./csv-parser')
+var bin = require('./bin')
+
+var timed = require('./timed').timed
+var saveTimes = require('./timed').saveTimes
 
 const argv = process.argv.slice(2)
-if (!argv[0] || ['small', 'medium', 'big'].indexOf(argv[0]) == -1)
-  throw new Error('unrecognised arg: ' + argv[0])
+const filepath = argv[0]
+const transform_set = argv[1]
+const iters = +argv[2]
+if (!transform_set || ['small', 'medium', 'big'].indexOf(transform_set) == -1)
+  throw new Error('unrecognised transform_set: ' + transform_set)
 
-const transform_set = argv[0]
+parse(__dirname + '/../data/' + filepath + '.csv', ',')
+  .then(result => {
+    var index = require('../index.json')
+    var transforms = require('../transforms.json')
+
+    apply_index(new Dodo(result.data, result.columns), index)
+
+    const dodo = new Dodo(require('./typed.json'), index.map(f => f.name))
+
+    let i = -1
+    while (++i < iters) {
+      calculate_stats(dodo, transforms[transform_set], sampleSize(5, index))
+      get_cols(dodo, transforms[transform_set], sampleSize(5, index))
+    }
+
+    saveTimes(filepath, transform_set)
+  })
+  .catch(console.log.bind(console))
+
+const apply_index = timed(function apply_index(dodo, index) {
+  dodo = dodo.cols(index.map(f => f.name))
+
+  const len = index.length
+  dodo = dodo.map(row => {
+    let i = -1
+    let col
+    while(++i < len) {
+      col = index[i]
+      if (col.type == 'category') {
+        continue
+      } else if (col.type == 'number') {
+        const val = parseFloat(row[i])
+        row[i] = Number.isNaN(val) ? null : val
+      } else if (col.type == 'date') {
+        const val = moment(row[i], col.payload.format).valueOf()
+        row[i] = Number.isNaN(val) ? null : val
+      }
+    }
+    return row
+  })
+
+  fs.writeFileSync(__dirname + '/typed.json', JSON.stringify(dodo.toArray()))
+})
 
 // returns an iteratee function for use in filter
 function dropFunc(dodo, command) {
@@ -31,69 +81,30 @@ function combineFunc(dodo, command) {
   }
 }
 
-var index = require('../index.json')
-var transforms = require('../transforms.json')
-
-parse(__dirname + '/../data/lc_big.csv', ',')
-  .then(result => {
-    let dodo = new Dodo(result.data, result.columns)
-    dodo = apply_index(dodo)
-    dodo = apply_transforms(dodo, transform_set)
-    calculate_stats(dodo)
-  })
-  .catch(console.log.bind(console))
-
-function apply_index(dodo) {
-  console.time('apply index')
-
-  dodo = dodo.cols(index.map(f => f.name))
-
-  const len = index.length
-  dodo = dodo.map(row => {
-    let i = -1
-    let col
-    while(++i < len) {
-      col = index[i]
-      if (col.type == 'category') {
-        continue
-      } else if (col.type == 'number') {
-        const val = parseFloat(row[i])
-        row[i] = Number.isNaN(val) ? null : val
-      } else if (col.type == 'date') {
-        // const val = moment(row[i], col.payload.format).valueOf()
-        // row[i] = Number.isNaN(val) ? null : val
-      }
-    }
-    return row
-  })
-
-  console.timeEnd('apply index')
-  return dodo
-}
-
-function apply_transforms(dodo, benchmark) {
-  console.time('apply transforms: ' + benchmark)
-
-  for (const t of transforms[benchmark]) {
+function apply_transforms(dodo, transforms) {
+  for (const t of transforms) {
     if (t.type == 'drop')
       dodo = dodo.filter(dropFunc(dodo, t))
     else if (t.type == 'combine')
       dodo = dodo.map(combineFunc(dodo, t))
   }
-
-  console.timeEnd('apply transforms: ' + benchmark)
-
   return dodo
 }
 
-function calculate_stats(dodo) {
-  console.time('calc stats')
-  console.time('materialize')
+const get_cols = timed(function get_cols(dodo, transforms, index) {
+  dodo = apply_transforms(dodo, transforms)
+
+  dodo.cols(index.map(f => f.name)).toArray()
+})
+
+const calculate_stats = timed(function calculate_stats(dodo, transforms, index) {
+  dodo = apply_transforms(dodo, transforms)
   dodo = new Dodo(dodo.toArray(), dodo.index)
-  console.timeEnd('materialize')
+
   const stats = dodo
     .cols(index.filter(f => f.type == 'number').map(f => f.name))
     .stats('min', 'max', 'mean')
+
   for (const col of index) {
     if (col.type == 'number') {
       const s = stats[col.name]
@@ -111,52 +122,6 @@ function calculate_stats(dodo) {
       }
     }
   }
-  console.timeEnd('calc stats')
+
   return stats
-}
-
-function bin(series, nrOfBins, extent) {
-  series = t.filter(
-    series,
-    extent
-      ? v => Number.isFinite(v) && v <= extent[1] && v >= extent[0]
-      : Number.isFinite
-  )
-
-  // copy the series before because sort acts inplace
-  series = [...series]
-  series.sort((a, b) => a - b)
-
-  let len = series.length
-  let seriesMin = series[0]
-  let seriesMax = series[len - 1]
-
-  const binWidth = (seriesMax - seriesMin) / nrOfBins
-
-  let bins = t.map(
-    range(0, nrOfBins),
-    i => {
-      const isLastBin = i === nrOfBins - 1
-      const binMin = seriesMin + i * binWidth
-      const binMax = isLastBin ? seriesMax : binMin + binWidth
-      return {
-        min: binMin,
-        max: binMax,
-        mid: (binMin + binMax) / 2,
-        count: 0
-      }
-    }
-  )
-
-  let seriesIndex = 0
-  let binIndex = 0
-  while (seriesIndex++ < len) {
-    let item = series[seriesIndex]
-    while(item > bins[binIndex].max) {
-      ++binIndex
-    }
-    bins[binIndex].count++
-  }
-
-  return bins
-}
+})
