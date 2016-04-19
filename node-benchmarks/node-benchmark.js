@@ -1,10 +1,8 @@
 'use strict';
 
 var t = require('transducers.js')
-var readline = require('readline')
-var fs = require('fs')
-
-var file = fs.createReadStream(__dirname + '/../data/lc_big.csv')
+var Dodo = require('dodos').default
+var parse = require('./csv-parser')
 
 // returns an iteratee function for use in map
 function dropFunc(columns, command) {
@@ -28,18 +26,17 @@ var transformCommands = [
 var dropCommand = transformCommands.find(t => t.type == 'drop')
 var combineCommand = transformCommands.find(t => t.type == 'combine')
 
-var rl = readline.createInterface({ input: file })
-var data = []
-rl.on('line', function(line) { data.push(line.split(',')) })
-file.on('end', function() {
-  var columns = data[0]
-  data.splice(0, 1)
-  transform(columns, data)
-})
+const csv = parse(__dirname + '/../data/lc_big.csv', ',')
+  .then((result) => {
+    transform(result.index, result.data)
+  })
+  .catch(console.log.bind(console))
 
-function transform(columns, data) {
+function transform(index, data) {
   console.time('node apply transforms')
-  data = t.map(data, combineFunc(columns, combineCommand))
-  data = t.filter(data, dropFunc(columns, dropCommand))
+  let dodo = new Dodo(data, index)
+  dodo = dodo.map(combineFunc(index, combineCommand))
+  dodo = dodo.filter(dropFunc(index, dropCommand))
+  dodo.toArray()
   console.timeEnd('node apply transforms')
 }
