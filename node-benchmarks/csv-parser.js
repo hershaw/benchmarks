@@ -12,9 +12,9 @@ function parse(path, delimiter) {
     })
 
     file.on('end', function() {
-      var index = data[0]
+      var columns = data[0]
       data.splice(0, 1)
-      resolve({data: data, index: index})
+      resolve({data: data, columns: columns})
     })
   })
 }
