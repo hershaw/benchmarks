@@ -1,20 +1,15 @@
 import pandas as pd
 # import numpy as np
 from util import split_drops_combines, force_float
+import random
 
 
 def load_file(filename):
-    if filename.endswith('.csv'):
-        return pd.read_csv(filename)
-    elif filename.endswith('.json'):
-        return pd.read_json(filename)
+    return pd.read_csv(filename)
 
 
-def to_file(df, filename, _format):
-    if _format == 'csv':
-        df.to_csv(filename, index=False, encoding='utf-8')
-    elif _format == 'json':
-        df.to_json(filename)
+def to_file(df, filename):
+    df.to_csv(filename, index=False, encoding='utf-8')
     return df
 
 
@@ -25,12 +20,11 @@ def remove_columns(df, index):
     if len(diff):
         print('removing {} columns'.format(len(diff)))
         for colname in diff:
-            df = df.drop(colname, axis=1, inplace=True)
-    return df
+            df.drop(colname, axis=1, inplace=True)
 
 
 def apply_index(df, index):
-    df = remove_columns(df, index)
+    remove_columns(df, index)
     for col in index:
         series = df[col['name']]
         if col['type'] == 'date':
@@ -77,6 +71,17 @@ def apply_transforms(df, transforms):
     return df
 
 
+def get_random_cols(df, ncols):
+    colnames = df.columns
+    coldata = []
+    for i in range(0, ncols):
+        colname = random.choice(colnames)
+        coldata.append(list(df[colname]))
+    print('returning {} cols with a total of {} entries'.format(
+        ncols, sum(list(map(len, coldata)))))
+    return coldata
+
+
 def get_hist(series, nbins, _min, _max):
     if _min == _max or not len(series):
         return [len(series)]
@@ -84,25 +89,37 @@ def get_hist(series, nbins, _min, _max):
     return pd.cut(series, nbins)
 
 
+def get_random_stats(df, index, ncols):
+    colstats = []
+    for i in range(0, ncols):
+        col_index = random.randint(0, len(index) - 1)
+        col = index[col_index]
+        name, _type = col['name'], col['type']
+        colstats.append(calculate_col_stats(df[name], _type))
+    return colstats
+
+
+def calculate_col_stats(series, _type):
+    if _type in ('number', 'date'):
+        series = series.dropna()
+        _min, _max = series.min(), series.max()
+        return {
+            'min': _min,
+            'max': _max,
+            'mean': series.mean(),
+            'hist': get_hist(series, 30, _min, _max)
+        }
+    elif _type == 'category':
+        return {
+            'uniques': series.nunique(),
+            'counts': series.value_counts(),
+        }
+
+
 def calculate_stats(df, index):
     info = []
     for col in index:
-        name, _type = col['name'], col['type']
-        series = df[name]
-        if _type == 'number':
-            series = series.dropna()
-            _min, _max = series.min(), series.max()
-            info.append({
-                'min': _min,
-                'max': _max,
-                'mean': series.mean(),
-                'hist': get_hist(series, 30, _min, _max)
-            })
-        elif _type == 'category':
-            info.append({
-                'uniques': series.nunique(),
-                'counts': series.value_counts(),
-            })
+        info.append(calculate_stats_col(df[col['name']], col['type']))
     return df
 
 
