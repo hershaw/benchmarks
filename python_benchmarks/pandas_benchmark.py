@@ -1,18 +1,36 @@
 import pandas as pd
-import numpy as np
+# import numpy as np
 from util import split_drops_combines, force_float
 
 
-def load_csv(filename):
-    return pd.read_csv(filename)
+def load_file(filename):
+    if filename.endswith('.csv'):
+        return pd.read_csv(filename)
+    elif filename.endswith('.json'):
+        return pd.read_json(filename)
 
 
-def to_csv(df, filename):
-    df.to_csv(filename, index=False, encoding='utf-8')
-    return load_csv(filename)
+def to_file(df, filename, _format):
+    if _format == 'csv':
+        df.to_csv(filename, index=False, encoding='utf-8')
+    elif _format == 'json':
+        df.to_json(filename)
+    return df
+
+
+def remove_columns(df, index):
+    index_names = set(list(map(lambda x: x['name'], index)))
+    column_names = set(df.columns)
+    diff = column_names - index_names
+    if len(diff):
+        print('removing {} columns'.format(len(diff)))
+        for colname in diff:
+            df = df.drop(colname, axis=1, inplace=True)
+    return df
 
 
 def apply_index(df, index):
+    df = remove_columns(df, index)
     for col in index:
         series = df[col['name']]
         if col['type'] == 'date':
