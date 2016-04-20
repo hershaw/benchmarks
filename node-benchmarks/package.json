@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "dodos": "~2.8.1",
-    "moment": "~2.13.0"
+    "lodash": "~4.10.0",
+    "moment": "~2.13.0",
+    "transducers.js": "~0.3.2"
   }
 }

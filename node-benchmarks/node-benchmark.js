@@ -5,7 +5,7 @@ var moment = require('moment')
 var sampleSize = require('lodash/fp/sampleSize')
 var Dodo = require('dodos').default
 
-var parse = require('./csv-parser')
+var parse = require('./csv-parser').parse
 var bin = require('./bin')
 
 var timed = require('./timed').timed
@@ -83,10 +83,11 @@ function combineFunc(dodo, command) {
 
 function apply_transforms(dodo, transforms) {
   for (const t of transforms) {
-    if (t.type == 'drop')
+    if (t.type == 'drop') {
       dodo = dodo.filter(dropFunc(dodo, t))
-    else if (t.type == 'combine')
+    } else if (t.type == 'combine') {
       dodo = dodo.map(combineFunc(dodo, t))
+    }
   }
   return dodo
 }
@@ -98,7 +99,9 @@ const get_cols = timed(function get_cols(dodo, transforms, index) {
 })
 
 const calculate_stats = timed(function calculate_stats(dodo, transforms, index) {
+  console.log(dodo.length)
   dodo = apply_transforms(dodo, transforms)
+  console.log(dodo.length)
   dodo = new Dodo(dodo.toArray(), dodo.index)
 
   const stats = dodo
