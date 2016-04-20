@@ -35,12 +35,9 @@ def apply_index(sf, index):
     for col in index:
         name, _type = col['name'], col['type']
         if _type == 'date':
-            # sf[name] = sf[name].apply(to_datetime).astype(int)
             sf[name] = sf[name].str_to_datetime('%b-%Y')
         elif _type == 'number':
             sf[name] = sf[name].apply(force_float).astype(float)
-        # I don't think you need to set category as a type. all the stats
-        # we care about should continue to work.
     return sf
 
 
@@ -74,6 +71,8 @@ def to_file(sf, filename):
 
 def do_drops(sf, drops):
     for drop in drops:
+        if len(drop['payload']) == 0:
+            continue
         payload = set(drop['payload'])
         # uhhh pretty bad for the potentiall in-band fillna but I need
         # to do this here or sframe will also drop null entries
@@ -84,9 +83,11 @@ def do_drops(sf, drops):
 
 def do_combines(sf, combines):
     for c in combines:
-        newval = '_'.join(map(str, c['payload']))
-        payload = set(c['payload'])
-        sf[c['name']] = sf[c['name']].apply(
+        colname, payload = c['name'], c['payload']
+        payload.sort()
+        newval = '_'.join(payload[:2])
+        payload = set(payload)
+        sf[colname] = sf[colname].apply(
             lambda x: newval if x in payload else x)
     return sf
 
