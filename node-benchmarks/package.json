@@ -1,18 +1,20 @@
 {
   "name": "node-benchmarks",
   "version": "1.0.0",
-  "description": "",
+  "description": "a",
   "main": "df-benchmark.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "a",
   "license": "ISC",
   "dependencies": {
+    "csv-parse": "~1.0.4",
     "dodos": "~2.8.1",
     "lodash": "~4.10.0",
     "moment": "~2.13.0",
+    "through": "~2.3.8",
     "transducers.js": "~0.3.2"
   }
 }

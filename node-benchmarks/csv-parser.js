@@ -1,12 +1,12 @@
 var fs = require('fs')
+var through = require('through')
+var parse = require('csv-parse')
 
-function parse(path, delimiter) {
+function parseAsPromised(path, delimiter) {
   return new Promise(function(resolve) {
     var file = fs.createReadStream(path)
     var data = []
 
-    var through = require('through')
-    var parse = require('csv-parse')
     var parser = parse({delimiter: delimiter})
 
     file
@@ -40,6 +40,6 @@ function parseLazy(path, delimiter) {
 }
 
 module.exports = {
-  parse: parse,
+  parse: parseAsPromised,
   parseLazy: parseLazy
 }
