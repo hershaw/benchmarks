@@ -20,8 +20,8 @@ function getTimes() {
 
 function saveTimes() {
   const args = [].slice.call(arguments)
-  const str = times.map(time => args.concat(time).join(' ')).join('\n')
-  fs.appendFileSync('./times.txt', str + '\n')
+  const str = times.map(time => time[1]).join('\n')
+  fs.writeFileSync('./timings/' + args.join('-'), str + '\n')
 }
 
 module.exports = {
