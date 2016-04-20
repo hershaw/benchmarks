@@ -163,8 +163,6 @@ def get_random_cols(sf, ncols):
     for i in range(0, ncols):
         colname = random.choice(colnames)
         coldata.append(list(map(lambda x: x, sf[colname])))
-    print('returning {} cols with a total of {} entries'.format(
-        ncols, sum(list(map(len, coldata)))))
     return coldata
 
 
@@ -175,7 +173,6 @@ def get_random_stats(sf, index, ncols):
         col = index[col_index]
         name, _type = col['name'], col['type']
         colstats.append(calculate_col_stats(sf[name], name, _type))
-    pretty_print(colstats)
     return colstats
 
 

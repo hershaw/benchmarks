@@ -23,7 +23,6 @@ def remove_columns(df, index):
     column_names = set(df.columns)
     diff = column_names - index_names
     if len(diff):
-        print('removing {} columns'.format(len(diff)))
         for colname in diff:
             df.drop(colname, axis=1, inplace=True)
 
