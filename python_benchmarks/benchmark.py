@@ -66,7 +66,7 @@ def run_benchmark(libname, frame, benchmarks):
 def start_memory_profiling():
     name = benchmark_name()
     pid = os.getpid()
-    os.system('nohup pidstat -r -p {} > profile/`hostname`-{}.mem &'.format(
+    os.system('nohup pidstat -r -p {} 1 > profile/`hostname`-{}.mem &'.format(
                 pid, name))
 
 

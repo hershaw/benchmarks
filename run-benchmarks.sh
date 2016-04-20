@@ -2,6 +2,9 @@
 
 git pull origin master
 
+rm profile/*
+rm timings/*
+
 datasets="
 lc
 lc_big
