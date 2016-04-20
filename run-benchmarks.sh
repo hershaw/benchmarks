@@ -16,7 +16,7 @@ pandas
 sframe
 "
 
-nruns=1
+nruns=10
 
 for d in $datasets
 do
