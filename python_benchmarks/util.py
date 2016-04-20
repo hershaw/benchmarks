@@ -1,7 +1,13 @@
 import time
 import re
+import pprint
 
 strip_non_number_regex = re.compile('[^0-9\.,]')
+
+
+def pretty_print(obj):
+    pp = pprint.PrettyPrinter()
+    pp.pprint(obj)
 
 
 def force_float(x):
@@ -24,8 +30,10 @@ class timer():
 
     @classmethod
     def end(cls, name):
-        print('{}: {}s'.format(name, time.time() - cls.timers[name]))
+        total_time = time.time() - cls.timers[name]
+        print('%s: %0.2f' % (name, total_time))
         del cls.timers[name]
+        return total_time
 
 
 def split_drops_combines(transforms):
