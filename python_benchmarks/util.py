@@ -1,7 +1,13 @@
 import time
 import re
+import pprint
 
 strip_non_number_regex = re.compile('[^0-9\.,]')
+
+
+def pretty_print(obj):
+    pp = pprint.PrettyPrinter()
+    pp.pprint(obj)
 
 
 def force_float(x):

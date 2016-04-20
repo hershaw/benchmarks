@@ -1,3 +1,4 @@
+import os
 import argparse
 from statistics import mean
 # import os
@@ -17,9 +18,12 @@ parser.add_argument(
     '-t', '--transforms', help='Which set of transforms to run', type=str,
     choices=['small', 'medium', 'large'], required=False)
 parser.add_argument(
+    '-f', '--stats-for', help='Which column to get stats for', type=str,
+    required=False)
+parser.add_argument(
     '-b', '--benchmark', help='Which benchmark to use.', type=str,
     choices=['apply_index_and_write', 'get_random_cols',
-             'get_random_stats'],
+             'get_random_stats', 'print_stats_for'],
     required=True)
 parser.add_argument(
     '-n', '--nruns', help='How many times to run the benchmark', type=int,
@@ -59,6 +63,17 @@ def run_benchmark(libname, frame, benchmarks):
     return totaltime
 
 
+def start_memory_profiling():
+    name = benchmark_name()
+    pid = os.getpid()
+    os.system('nohup pidstat -r -p {} > profile/{}.mem &'.format(pid, name))
+
+
+def benchmark_name():
+    return '{}-{}-{}-{}'.format(
+        args.lib, args.dataset, args.benchmark, args.transforms)
+
+
 if __name__ == '__main__':
     libname = args.lib
     dataset = args.dataset
@@ -81,6 +96,12 @@ if __name__ == '__main__':
             ('set_dtypes', [index]),
             ('get_random_stats', [index, 5])
         ],
+        # for quick visual inspection
+        'print_stats_for': [
+            ('apply_transforms', [transforms]),
+            ('set_dtypes', [index]),
+            ('print_stats_for', [index, args.stats_for])
+        ],
         'check_output': [  # for sanity checks
             ('apply_index', [index]),
             ('apply_transforms', [transforms]),
@@ -91,6 +112,8 @@ if __name__ == '__main__':
     timer.start('{}-load'.format(libname))
     frame = module.load_file(realpath(dataset))
     timer.end('{}-load'.format(libname))
+
+    start_memory_profiling()
 
     times = []
     for i in range(0, args.nruns):

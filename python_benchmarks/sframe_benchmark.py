@@ -1,6 +1,6 @@
 from collections import Counter
 import sframe
-from util import force_float, split_drops_combines
+from util import force_float, split_drops_combines, pretty_print
 import datetime as dt
 from functools import reduce
 import random
@@ -75,7 +75,10 @@ def to_file(sf, filename):
 def do_drops(sf, drops):
     for drop in drops:
         payload = set(drop['payload'])
-        sf = sf[sf[drop['name']].apply(lambda x: x not in payload)]
+        # uhhh pretty bad for the potentiall in-band fillna but I need
+        # to do this here or sframe will also drop null entries
+        sf = sf[sf[drop['name']].fillna('______').apply(
+            lambda x: x not in payload)]
     return sf
 
 
@@ -89,9 +92,11 @@ def do_combines(sf, combines):
 
 
 def apply_transforms(sf, transforms):
+    print('shape before tramsforms {}'.format(sf    .shape))
     drops, combines = split_drops_combines(transforms)
     sf = do_drops(sf, drops)
     do_combines(sf, combines)
+    print('shape after transforms {}'.format(sf.shape))
     return sf
 
 
@@ -171,18 +176,28 @@ def get_random_stats(sf, index, ncols):
         col_index = random.randint(0, len(index) - 1)
         col = index[col_index]
         name, _type = col['name'], col['type']
-        colstats.append(calculate_col_stats(sf[name], _type))
+        colstats.append(calculate_col_stats(sf[name], name, _type))
+    pretty_print(colstats)
     return colstats
 
 
-def calculate_col_stats(sarr, _type):
+def print_stats_for(sf, index, colname):
+    col = list(filter(lambda x: x['name'] == colname, index))[0]
+    name, _type = col['name'], col['type']
+    stats = calculate_col_stats(sf[name], name, _type)
+    pretty_print(stats)
+    return stats
+
+
+def calculate_col_stats(sarr, name, _type):
     if _type in ('number', 'date'):
         _min, _max = sarr.min(), sarr.max()
         return {
             'min': _min,
             'max': _max,
             'mean': sarr.mean(),
-            'hist': get_hist(sarr, 30, _min, _max)
+            'hist': get_hist(sarr, 30, _min, _max),
+            'name': name,
         }
     elif _type == 'category':
         # do a reduce in order to avoid building a new data structure
@@ -194,13 +209,15 @@ def calculate_col_stats(sarr, _type):
         return {
             'uniques': len(counts),
             'counts': counts.most_common(10),
+            'name': name,
         }
 
 
 def calculate_stats(sf, index):
     info = []
     for col in index:
-        info.append(calculate_col_stats(sf[col['name']], col['type']))
+        name, _type = col['name'], col['type']
+        info.append(calculate_col_stats(sf[name], name, _type))
     return sf
 
 

@@ -2,7 +2,7 @@ import random
 from functools import reduce
 import pandas as pd
 # import numpy as np
-from util import split_drops_combines, force_float
+from util import split_drops_combines, force_float, pretty_print
 
 
 def load_file(filename):
@@ -49,10 +49,10 @@ def drop_rows_with_vals(df, drops):
     for drop in drops:
         if len(drop['payload']) == 0:
             return
-        payload = set(drop['payload'])
+        payload = drop['payload']
         colname = drop['name']
-        # need to check if the payload exists or pandas will throw an exception
         mask = df[colname].isin(payload)
+        print('dropping {} for {}'.format(mask.sum(), drop))
         df.drop(df.loc[mask].index, inplace=True)
 
 
@@ -68,9 +68,11 @@ def combine(df, combines):
 
 
 def apply_transforms(df, transforms):
+    print('shape before tramsforms {}'.format(df.shape))
     drops, combines = split_drops_combines(transforms)
     drop_rows_with_vals(df, drops)
     combine(df, combines)
+    print('shape after transforms {}'.format(df.shape))
     return df
 
 
@@ -94,7 +96,7 @@ def get_hist(series, nbins, _min, _max):
 
     bins = []
     for i, c in enumerate(cuts[0:-1]):
-        bins.append({'start': i, 'end': cuts[i + 1], 'count': 0})
+        bins.append({'start': c, 'end': cuts[i + 1], 'count': 0})
 
     def buildhist(_bins, bin_index):
         bins[bin_index]['count'] += 1
@@ -109,11 +111,19 @@ def get_random_stats(df, index, ncols):
         col_index = random.randint(0, len(index) - 1)
         col = index[col_index]
         name, _type = col['name'], col['type']
-        colstats.append(calculate_col_stats(df[name], _type))
+        colstats.append(calculate_col_stats(df[name], name, _type))
     return colstats
 
 
-def calculate_col_stats(series, _type):
+def print_stats_for(df, index, colname):
+    col = list(filter(lambda x: x['name'] == colname, index))[0]
+    name, _type = col['name'], col['type']
+    stats = calculate_col_stats(df[name], name, _type)
+    pretty_print(stats)
+    return stats
+
+
+def calculate_col_stats(series, name, _type):
     if _type in ('number', 'date'):
         series = series.dropna()
         _min, _max = series.min(), series.max()
@@ -121,19 +131,22 @@ def calculate_col_stats(series, _type):
             'min': _min,
             'max': _max,
             'mean': series.mean(),
-            'hist': get_hist(series, 30, _min, _max)
+            'hist': get_hist(series, 30, _min, _max),
+            'name': name,
         }
     elif _type == 'category':
         return {
             'uniques': series.nunique(),
             'counts': series.value_counts(),
+            'name': name,
         }
 
 
 def calculate_stats(df, index):
     info = []
     for col in index:
-        info.append(calculate_col_stats(df[col['name']], col['type']))
+        name, _type = col['name'], col['type']
+        info.append(calculate_col_stats(df[name], name, _type))
     return df
 
 
