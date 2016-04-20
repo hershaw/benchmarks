@@ -30,12 +30,12 @@ def remove_columns(df, index):
 def apply_index(df, index):
     remove_columns(df, index)
     for col in index:
-        series = df[col['name']]
-        if col['type'] == 'date':
-            df[col['name']] = pd.to_datetime(
-                series, errors='coerce', format='%m-%Y')
-        elif col['type'] == 'number':
-            df[col['name']] = series.map(force_float)
+        name, _type = col['name'], col['type']
+        series = df[name]
+        if _type == 'date':
+            df[name] = pd.to_datetime(series, errors='coerce', format='%m-%Y')
+        elif _type == 'number':
+            df[name] = series.map(force_float)
     return df
 
 
@@ -47,7 +47,7 @@ def set_dtypes(df, index):
 def drop_rows_with_vals(df, drops):
     for drop in drops:
         if len(drop['payload']) == 0:
-            return
+            continue
         payload = drop['payload']
         colname = drop['name']
         mask = df[colname].isin(payload)
@@ -56,13 +56,12 @@ def drop_rows_with_vals(df, drops):
 
 def combine(df, combines):
     for c in combines:
-        colname = c['name']
-        values = c['payload']
-        values.sort()
+        colname, payload = c['name'], c['payload']
+        payload.sort()
         repwith = '%s_%s' % (
-            colname, '-'.join([str(val) for val in values[:2]]))
-        values = {val: repwith for val in values}
-        df[colname] = df[colname].map(values)
+            colname, '-'.join([str(val) for val in payload[:2]]))
+        payload = {val: repwith for val in payload}
+        df[colname] = df[colname].map(payload)
 
 
 def apply_transforms(df, transforms):

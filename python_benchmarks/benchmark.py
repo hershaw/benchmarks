@@ -76,6 +76,7 @@ def benchmark_name():
 
 
 if __name__ == '__main__':
+    print('\n\nRunning Benchmark: {}\n\n'.format(benchmark_name()))
     libname = args.lib
     dataset = args.dataset
     benchmark = args.benchmark
