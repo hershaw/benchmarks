@@ -123,3 +123,6 @@ if __name__ == '__main__':
 
     print('\n'.join(map(str, times)))
     print('Average time: {}'.format(mean(times)))
+    withavg = times + [mean(times)]
+    os.system('echo "%s" > timings/%s' % (
+        '\n'.join(map(str, withavg)), benchmark_name()))
