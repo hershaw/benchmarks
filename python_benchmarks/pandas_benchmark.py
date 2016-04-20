@@ -52,7 +52,6 @@ def drop_rows_with_vals(df, drops):
         payload = drop['payload']
         colname = drop['name']
         mask = df[colname].isin(payload)
-        print('dropping {} for {}'.format(mask.sum(), drop))
         df.drop(df.loc[mask].index, inplace=True)
 
 
@@ -68,11 +67,9 @@ def combine(df, combines):
 
 
 def apply_transforms(df, transforms):
-    print('shape before tramsforms {}'.format(df.shape))
     drops, combines = split_drops_combines(transforms)
     drop_rows_with_vals(df, drops)
     combine(df, combines)
-    print('shape after transforms {}'.format(df.shape))
     return df
 
 
@@ -82,8 +79,6 @@ def get_random_cols(df, ncols):
     for i in range(0, ncols):
         colname = random.choice(colnames)
         coldata.append(list(df[colname]))
-    print('returning {} cols with a total of {} entries'.format(
-        ncols, sum(list(map(len, coldata)))))
     return coldata
 
 

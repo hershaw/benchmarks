@@ -92,11 +92,9 @@ def do_combines(sf, combines):
 
 
 def apply_transforms(sf, transforms):
-    print('shape before tramsforms {}'.format(sf    .shape))
     drops, combines = split_drops_combines(transforms)
     sf = do_drops(sf, drops)
     do_combines(sf, combines)
-    print('shape after transforms {}'.format(sf.shape))
     return sf
 
 

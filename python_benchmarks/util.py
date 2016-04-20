@@ -31,7 +31,7 @@ class timer():
     @classmethod
     def end(cls, name):
         total_time = time.time() - cls.timers[name]
-        print('{}: {}s'.format(name, total_time))
+        print('%s: %0.2f' % (name, total_time))
         del cls.timers[name]
         return total_time
 
