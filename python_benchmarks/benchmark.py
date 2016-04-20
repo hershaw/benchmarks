@@ -34,7 +34,7 @@ args = parser.parse_args()
 
 
 def realpath(fname):
-    return './data/{}'.format(fname)
+    return './data/{}.csv'.format(fname)
 
 
 def get_module(libname):
@@ -66,7 +66,8 @@ def run_benchmark(libname, frame, benchmarks):
 def start_memory_profiling():
     name = benchmark_name()
     pid = os.getpid()
-    os.system('nohup pidstat -r -p {} > profile/{}.mem &'.format(pid, name))
+    os.system('nohup pidstat -r -p {} > profile/`hostname`-{}.mem &'.format(
+                pid, name))
 
 
 def benchmark_name():
