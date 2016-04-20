@@ -24,8 +24,10 @@ class timer():
 
     @classmethod
     def end(cls, name):
-        print('{}: {}s'.format(name, time.time() - cls.timers[name]))
+        total_time = time.time() - cls.timers[name]
+        print('{}: {}s'.format(name, total_time))
         del cls.timers[name]
+        return total_time
 
 
 def split_drops_combines(transforms):

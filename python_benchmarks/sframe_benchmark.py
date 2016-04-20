@@ -7,6 +7,10 @@ import random
 # import math
 
 
+def copy_frame(sf):
+    return sframe.SFrame(sf)
+
+
 def to_datetime(val):
     try:
         return (

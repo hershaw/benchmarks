@@ -14,6 +14,10 @@ def to_file(df, filename):
     return df
 
 
+def copy_frame(df):
+    return pd.DataFrame(df)
+
+
 def remove_columns(df, index):
     index_names = set(list(map(lambda x: x['name'], index)))
     column_names = set(df.columns)

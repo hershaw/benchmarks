@@ -1,25 +1,29 @@
+import argparse
+from statistics import mean
 # import os
 from util import timer
 from index import index
 from transforms import transforms
-import argparse
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    '--lib',
+    '-l', '--lib',
     help='Library to use.', type=str, choices=['pandas', 'sframe'],
     required=True)
 parser.add_argument(
-    '--dataset', help='Which dataset to use', type=str, required=True)
+    '-d', '--dataset', help='Which dataset to use', type=str, required=True)
 parser.add_argument(
-    '--transforms', help='Which set of transforms to run', type=str,
+    '-t', '--transforms', help='Which set of transforms to run', type=str,
     choices=['small', 'medium', 'large'], required=False)
 parser.add_argument(
-    '--benchmark', help='Which benchmark to use.', type=str,
+    '-b', '--benchmark', help='Which benchmark to use.', type=str,
     choices=['apply_index_and_write', 'get_random_cols',
              'get_random_stats'],
     required=True)
+parser.add_argument(
+    '-n', '--nruns', help='How many times to run the benchmark', type=int,
+    default=1)
 
 
 args = parser.parse_args()
@@ -29,29 +33,34 @@ def realpath(fname):
     return './data/{}'.format(fname)
 
 
-def run_benchmark(libname, filename, benchmarks):
+def get_module(libname):
     if libname == 'pandas':
         import pandas_benchmark as module
     elif libname == 'sframe':
         import sframe_benchmark as module
+    else:
+        raise ValueError('no lib with name "{}" found'.format(libname))
+    return module
 
-    timer.start('{}-load'.format(libname))
-    frame = module.load_file(realpath(filename))
-    timer.end('{}-load'.format(libname))
+
+def run_benchmark(libname, frame, benchmarks):
+    module = get_module(libname)
+    frame = module.copy_frame(frame)
 
     timer.start('{}-total'.format(libname))
     for funcname, args in benchmarks:
         timer.start('{}-{}'.format(libname, funcname))
         frame = getattr(module, funcname)(frame, *args)
         timer.end('{}-{}'.format(libname, funcname))
+
     print('+++++++++++++++++++++++++++++++')
-    timer.end('{}-total'.format(libname))
+    totaltime = timer.end('{}-total'.format(libname))
     print('+++++++++++++++++++++++++++++++')
-    print('the "total" time DOES not include file read time')
+    return totaltime
 
 
 if __name__ == '__main__':
-    lib = args.lib
+    libname = args.lib
     dataset = args.dataset
     benchmark = args.benchmark
     transforms = transforms[args.transforms] if args.transforms else None
@@ -60,7 +69,7 @@ if __name__ == '__main__':
     benchmarks = {
         'apply_index_and_write': [
             ('apply_index', [index]),
-            ('to_file', [realpath('{}_{}'.format(lib, dataset))]),
+            ('to_file', [realpath('{}_{}'.format(libname, dataset))]),
         ],
         'get_random_cols': [
             ('apply_transforms', [transforms]),
@@ -78,4 +87,15 @@ if __name__ == '__main__':
             ('check_output', [transforms]),
         ]
     }
-    run_benchmark(lib, dataset, benchmarks[args.benchmark])
+    module = get_module(libname)
+    timer.start('{}-load'.format(libname))
+    frame = module.load_file(realpath(dataset))
+    timer.end('{}-load'.format(libname))
+
+    times = []
+    for i in range(0, args.nruns):
+        times.append(
+            run_benchmark(libname, frame, benchmarks[args.benchmark]))
+
+    print('\n'.join(map(str, times)))
+    print('Average time: {}'.format(mean(times)))
