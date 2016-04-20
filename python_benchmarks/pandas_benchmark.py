@@ -1,7 +1,8 @@
+import random
+from functools import reduce
 import pandas as pd
 # import numpy as np
 from util import split_drops_combines, force_float
-import random
 
 
 def load_file(filename):
@@ -32,8 +33,6 @@ def apply_index(df, index):
                 series, errors='coerce', format='%m-%Y')
         elif col['type'] == 'number':
             df[col['name']] = series.map(force_float)
-        # elif col['type'] == 'category':
-            # sf[col['name']] = sarr.apply(empty_str_to_null)
     return df
 
 
@@ -85,8 +84,19 @@ def get_random_cols(df, ncols):
 def get_hist(series, nbins, _min, _max):
     if _min == _max or not len(series):
         return [len(series)]
-    # not the same format as the sframe one, but this should be okay
-    return pd.cut(series, nbins)
+
+    binned, cuts = pd.cut(
+        series, nbins, retbins=True, labels=list(range(0, nbins)))
+
+    bins = []
+    for i, c in enumerate(cuts[0:-1]):
+        bins.append({'start': i, 'end': cuts[i + 1], 'count': 0})
+
+    def buildhist(_bins, bin_index):
+        bins[bin_index]['count'] += 1
+        return _bins
+
+    return reduce(buildhist, binned, bins)
 
 
 def get_random_stats(df, index, ncols):
@@ -119,7 +129,7 @@ def calculate_col_stats(series, _type):
 def calculate_stats(df, index):
     info = []
     for col in index:
-        info.append(calculate_stats_col(df[col['name']], col['type']))
+        info.append(calculate_col_stats(df[col['name']], col['type']))
     return df
 
 
