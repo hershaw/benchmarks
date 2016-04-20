@@ -18,6 +18,8 @@ const iters = +argv[3]
 if (!transform_set || ['small', 'medium', 'large'].indexOf(transform_set) == -1)
   throw new Error('unrecognised transform_set: ' + transform_set)
 
+console.log('\n\nstarting node-' + argv.slice(0, -1).join('-') + '\n\n')
+
 var index = require('../index.json')
 
 require('child_process')
