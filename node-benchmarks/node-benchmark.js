@@ -14,28 +14,41 @@ var saveTimes = require('./timed').saveTimes
 const argv = process.argv.slice(2)
 const filepath = argv[0]
 const transform_set = argv[1]
-const iters = +argv[2]
+const action = argv[2]
+const iters = +argv[3]
 if (!transform_set || ['small', 'medium', 'big'].indexOf(transform_set) == -1)
   throw new Error('unrecognised transform_set: ' + transform_set)
 
-parse(__dirname + '/../data/' + filepath + '.csv', ',')
-  .then(result => {
-    var index = require('../index.json')
-    var transforms = require('../transforms.json')
+var index = require('../index.json')
 
-    apply_index(new Dodo(result.data, result.columns), index)
+if (action == 'apply_index') {
+  parse(__dirname + '/../data/' + filepath + '.csv', ',')
+    .then(result => {
+      apply_index(new Dodo(result.data, result.columns), index)
+      saveTimes(filepath, transform_set)
+    })
+    .catch(console.log.bind(console))
+} else if (action == 'get_cols') {
+  const transforms = require('../transforms.json')
+  const dodo = new Dodo(require('./typed.json'), index.map(f => f.name))
 
-    const dodo = new Dodo(require('./typed.json'), index.map(f => f.name))
+  let i = -1
+  while (++i < iters) {
+    get_cols(dodo, transforms[transform_set], sampleSize(5, index))
+  }
 
-    let i = -1
-    while (++i < iters) {
-      calculate_stats(dodo, transforms[transform_set], sampleSize(5, index))
-      get_cols(dodo, transforms[transform_set], sampleSize(5, index))
-    }
+  saveTimes(filepath, transform_set)
+} else if (action == 'calculate_stats') {
+  const transforms = require('../transforms.json')
+  const dodo = new Dodo(require('./typed.json'), index.map(f => f.name))
 
-    saveTimes(filepath, transform_set)
-  })
-  .catch(console.log.bind(console))
+  let i = -1
+  while (++i < iters) {
+    calculate_stats(dodo, transforms[transform_set], sampleSize(5, index))
+  }
+
+  saveTimes(filepath, transform_set, action)
+}
 
 const apply_index = timed(function apply_index(dodo, index) {
   dodo = dodo.cols(index.map(f => f.name))
