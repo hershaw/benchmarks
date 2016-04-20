@@ -20,6 +20,9 @@ if (!transform_set || ['small', 'medium', 'large'].indexOf(transform_set) == -1)
 
 var index = require('../index.json')
 
+require('child_process')
+  .execSync('nohup pidstat -r -p ' + process.pid + ' > profile/`hostname`-' + argv.slice(0, -1).join('-') + '.mem &')
+
 if (action == 'apply_index') {
 
   parse(__dirname + '/../data/' + filepath + '.csv', ',')
